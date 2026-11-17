@@ -47,8 +47,8 @@
 
         <div class="text-xl mt-2">Dashboard colors</div>
         <p class="text-sm text-gray-600">
-            The same color presets as the Tunnel R.A.T. dashboard. They color the Tunnel R.A.T.
-            themes: the header line in Light, the whole page in Dashboard.
+            The same color presets as the Tunnel R.A.T. dashboard. They color the Ratcatcher
+            themes: the header line in Ratcatcher, the whole page in Tunnel R.A.T. Dashboard.
         </p>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
             {#each COLOR_PRESETS as p (p.id)}

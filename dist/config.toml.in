@@ -13,7 +13,7 @@ colorblind_mode = false
 # 2 = Demo Mode, display a fun orca gif
 # 3 = display the EFF logo
 # 4 = High Visibility mode, fill the entire screen with the status color (green=running, white=paused, red=warnings)
-# 5 = Tunnel R.A.T. (Orbic): rat in status colours (yellow=no link, green=connected, blue flash=new cell,
+# 5 = Ratcatcher (Orbic): rat in status colours (yellow=no link, green=connected, blue flash=new cell,
 #     red=link lost, purple=possible stingray), pairing code until paired, then cell and stingray counters
 #
 # TP-Link with one-bit display:

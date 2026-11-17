@@ -20,7 +20,7 @@ export const THEMES: ThemeInfo[] = [
     {
         id: 'auto',
         name: 'Automatic',
-        description: 'Tunnel R.A.T. when Device UI is set to Tunnel R.A.T., otherwise Rayhunter.',
+        description: 'Ratcatcher when Device UI is set to Ratcatcher, otherwise Rayhunter.',
         swatch: ['#14202b', '#ffffff', '#3ddc84'],
     },
     {
@@ -31,7 +31,7 @@ export const THEMES: ThemeInfo[] = [
     },
     {
         id: 'tunnel-rat',
-        name: 'Tunnel R.A.T. Light',
+        name: 'Ratcatcher',
         description: 'Dark header with the rat, light page. Uses the dashboard colors for its header line.',
         swatch: ['#14202b', '#ffffff', '#ff2222'],
     },

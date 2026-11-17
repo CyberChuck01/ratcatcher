@@ -132,6 +132,11 @@
     });
 </script>
 
+<svelte:head>
+    {#if tr_theme}
+        <title>Ratcatcher</title>
+    {/if}
+</svelte:head>
 <LogView bind:shown={logview_shown} />
 <ConfigForm bind:shown={config_shown} />
 <TowersView bind:shown={towers_shown} />
@@ -159,7 +164,7 @@
                 class="h-10 xl:h-12 rounded-md"
             />
             <span class="text-white text-xl xl:text-2xl font-bold tracking-widest"
-                >TUNNEL R.A.T.</span
+                >RATCATCHER</span
             >
         </div>
     {:else}

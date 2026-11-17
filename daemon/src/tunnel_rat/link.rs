@@ -65,7 +65,7 @@ pub async fn link(
     if !key.as_deref().is_some_and(pairing::is_valid_key) {
         return (
             StatusCode::UNAUTHORIZED,
-            "Tunnel R.A.T. link: pair first, then send the API key\n",
+            "Ratcatcher link: pair first, then send the API key\n",
         )
             .into_response();
     }
