@@ -41,6 +41,14 @@ pub fn update_ui(
     shutdown_token: CancellationToken,
     ui_update_rx: Receiver<DisplayState>,
 ) {
+    if config.ui_level == config::UiLevel::TunnelRat {
+        return super::tunnel_rat_orbic::update_ui(
+            task_tracker,
+            Framebuffer,
+            shutdown_token,
+            ui_update_rx,
+        );
+    }
     generic_framebuffer::update_ui(
         task_tracker,
         config,

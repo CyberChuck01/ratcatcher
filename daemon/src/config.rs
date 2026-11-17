@@ -25,6 +25,8 @@ pub enum UiLevel {
     Demo = 2,
     EffLogo = 3,
     HighVisibility = 4,
+    /// Tunnel R.A.T.: status-coloured rat, pairing code, cell and stingray counters
+    TunnelRat = 5,
     TransFlag = 128,
 }
 
@@ -150,7 +152,7 @@ impl Default for Config {
             port: 8080,
             debug_mode: false,
             device: Device::Orbic,
-            ui_level: UiLevel::Subtle,
+            ui_level: UiLevel::TunnelRat,
             colorblind_mode: false,
             key_input_mode: KeyInputMode::Disabled,
             analyzers: AnalyzerConfig::default(),

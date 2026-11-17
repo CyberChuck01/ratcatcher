@@ -408,16 +408,17 @@ impl DiagTask {
                 debug!("done!");
             }
 
-            // Extract the latest packet timestamp from this container
-            if let Some(ts) = container
-                .messages()
-                .into_iter()
-                .filter_map(|r| match r {
-                    Ok(Message::Log { timestamp, .. }) => Some(timestamp.to_datetime().timestamp()),
-                    _ => None,
-                })
-                .max()
-            {
+            // Extract the latest packet timestamp from this container. Tunnel R.A.T.:
+            // the same pass feeds the screen's cell counter, so nothing is parsed twice.
+            let mut latest_ts: Option<i64> = None;
+            for msg in container.messages().into_iter().flatten() {
+                crate::tunnel_rat::cells::observe_message(&msg);
+                if let Message::Log { timestamp, .. } = &msg {
+                    let ts = timestamp.to_datetime().timestamp();
+                    latest_ts = Some(latest_ts.map_or(ts, |m| m.max(ts)));
+                }
+            }
+            if let Some(ts) = latest_ts {
                 self.latest_packet_timestamp = Some(ts);
             }
 
@@ -433,6 +434,7 @@ impl DiagTask {
 
             if max_type > EventType::Informational {
                 info!("a heuristic triggered on this run!");
+                crate::tunnel_rat::status::stingray_hit();
                 self.notification_channel
                     .send(Notification::new(
                         NotificationType::Warning,

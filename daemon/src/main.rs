@@ -13,6 +13,7 @@ mod pcap;
 mod qmdl_store;
 mod server;
 mod stats;
+mod tunnel_rat;
 mod update;
 mod webdav;
 
@@ -88,6 +89,7 @@ fn get_router() -> AppRouter {
         .route("/api/debug/display-state", post(debug_set_display_state))
         .route("/api/gps", get(get_gps))
         .route("/api/gps", post(post_gps))
+        .route("/api/tunnel-rat/pair", post(tunnel_rat::pairing::pair))
         .route("/", get(|| async { Redirect::permanent("/index.html") }))
         .route("/{*path}", get(serve_static))
 }

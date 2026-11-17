@@ -183,6 +183,7 @@
                         <option value={2}>Demo mode (orca gif)</option>
                         <option value={3}>EFF logo</option>
                         <option value={4}>High visibility (full screen color)</option>
+                        <option value={5}>Tunnel R.A.T. (rat, pairing code, counters)</option>
                     </select>
                 </FormField>
 
