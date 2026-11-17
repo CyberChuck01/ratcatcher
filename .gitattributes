@@ -8,3 +8,8 @@ dist/config.toml.in eol=lf
 dist/scripts/misc-daemon eol=lf
 dist/scripts/rayhunter_daemon eol=lf
 scripts/*.sh eol=lf
+
+# Ratcatcher PiPack client: shell scripts run on the PiPack, the .bat on Windows
+clients/pipack/*.sh eol=lf
+clients/pipack/*.py eol=lf
+clients/pipack/*.bat eol=crlf
