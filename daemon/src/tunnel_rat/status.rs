@@ -6,7 +6,7 @@
 //! pulling in new EFF releases easy. Standard library only, so the screen
 //! renderer can be compiled and tested on its own.
 
-use std::collections::{BTreeSet, VecDeque};
+use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use std::sync::{Mutex, MutexGuard};
 use std::time::{Duration, Instant};
 
@@ -35,6 +35,15 @@ const EVENT_BACKLOG: usize = 256;
 pub enum Event {
     /// A cell this session hasn't heard before.
     Cell { earfcn: u32, pci: u16 },
+    /// The real identity of a cell, learned from its SIB1 broadcast:
+    /// PLMN as "MCC-MNC" (e.g. "310-260"), tracking area code, 28-bit cell identity.
+    CellId {
+        earfcn: u32,
+        pci: u16,
+        plmn: String,
+        tac: u16,
+        eci: u32,
+    },
     /// A new stingray encounter (bursts are merged like the counter).
     Alert { severity: String, stingrays: u32 },
     /// A new recording started; counters went back to zero.
@@ -48,6 +57,10 @@ struct Inner {
     /// LTE cells seen this session, keyed by (EARFCN, PCI).
     cells: BTreeSet<(u32, u16)>,
     last_new_cell: Option<Instant>,
+    /// The cell the modem last reported as serving, (EARFCN, PCI).
+    serving: Option<(u32, u16)>,
+    /// SIB1 identity of each cell: (PLMN, TAC, ECI).
+    ids: BTreeMap<(u32, u16), (String, u16, u32)>,
     stingrays: u32,
     last_alert: Option<Instant>,
     events: VecDeque<(u64, Event)>,
@@ -60,6 +73,8 @@ static STATUS: Mutex<Inner> = Mutex::new(Inner {
     recording: false,
     cells: BTreeSet::new(),
     last_new_cell: None,
+    serving: None,
+    ids: BTreeMap::new(),
     stingrays: 0,
     last_alert: None,
     events: VecDeque::new(),
@@ -102,6 +117,15 @@ pub fn cells_list() -> Vec<(u32, u16)> {
     lock().cells.iter().copied().collect()
 }
 
+/// Every cell whose identity is known, as (EARFCN, PCI, PLMN, TAC, ECI).
+pub fn cell_ids_list() -> Vec<(u32, u16, String, u16, u32)> {
+    lock()
+        .ids
+        .iter()
+        .map(|(&(earfcn, pci), (plmn, tac, eci))| (earfcn, pci, plmn.clone(), *tac, *eci))
+        .collect()
+}
+
 /// Everything the screen needs, copied out so no lock is held while drawing.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Snapshot {
@@ -139,6 +163,7 @@ pub fn new_session() {
     let mut s = lock();
     s.recording = true;
     s.cells.clear();
+    s.ids.clear();
     s.last_new_cell = None;
     s.stingrays = 0;
     s.last_alert = None;
@@ -156,6 +181,35 @@ pub fn cell_seen(earfcn: u32, pci: u16) {
         s.last_new_cell = Some(Instant::now());
         push_event(&mut s, Event::Cell { earfcn, pci });
     }
+}
+
+/// The modem says this cell is the one the phone is attached to right now.
+pub fn set_serving(earfcn: u32, pci: u16) {
+    lock().serving = Some((earfcn, pci));
+}
+
+/// A SIB1 was decoded. SIB1 is broadcast by the serving cell, so it is
+/// attached to whichever cell the modem last reported as serving.
+pub fn cell_id_seen(plmn: String, tac: u16, eci: u32) {
+    let mut s = lock();
+    let Some((earfcn, pci)) = s.serving else {
+        return;
+    };
+    let id = (plmn.clone(), tac, eci);
+    if s.ids.get(&(earfcn, pci)) == Some(&id) {
+        return;
+    }
+    s.ids.insert((earfcn, pci), id);
+    push_event(
+        &mut s,
+        Event::CellId {
+            earfcn,
+            pci,
+            plmn,
+            tac,
+            eci,
+        },
+    );
 }
 
 /// A Rayhunter heuristic fired. Bursts within `ALERT_MERGE` count once.
@@ -233,5 +287,25 @@ mod tests {
         );
         ensure_alert();
         assert_eq!(snapshot().stingrays, 1);
+
+        // SIB1 identity attaches to the serving cell; repeats are ignored.
+        set_serving(5230, 101);
+        let seq = latest_seq();
+        cell_id_seen("310-260".into(), 12345, 52_428_801);
+        cell_id_seen("310-260".into(), 12345, 52_428_801);
+        assert_eq!(
+            events_after(seq).0,
+            vec![Event::CellId {
+                earfcn: 5230,
+                pci: 101,
+                plmn: "310-260".into(),
+                tac: 12345,
+                eci: 52_428_801
+            }]
+        );
+        assert_eq!(
+            cell_ids_list(),
+            vec![(5230, 101, "310-260".to_string(), 12345, 52_428_801)]
+        );
     }
 }

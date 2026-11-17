@@ -14,6 +14,10 @@
 //!   {"type":"cells","cells":[[5230,101],...]}        every cell this session, once at connect
 //!   {"type":"status","recording":true,"cells":12,"stingrays":0}   every 2 s
 //!   {"type":"cell","earfcn":5230,"pci":101}           a cell not heard before this session
+//!   {"type":"cell_ids","cells":[[5230,101,"310-260",12345,52428801],...]}
+//!                                                     every identified cell, once at connect
+//!   {"type":"cell_id","earfcn":5230,"pci":101,"plmn":"310-260","tac":12345,"eci":52428801}
+//!                                                     a cell's identity from its SIB1 (link_version 2+)
 //!   {"type":"alert","severity":"High","stingrays":1}  a new stingray encounter
 //!   {"type":"new_session"}                            recording restarted, counters reset
 //!   {"type":"pong"} | {"type":"ack",...} | {"type":"error","error":"..."}
@@ -41,7 +45,7 @@ use crate::gps::GpsData;
 use crate::server::ServerState;
 
 /// Bumped when the message format changes in a way hubs need to know about.
-pub const LINK_VERSION: u32 = 1;
+pub const LINK_VERSION: u32 = 2;
 const STATUS_EVERY: Duration = Duration::from_secs(2);
 /// A hub that sends nothing for this long is treated as gone (catches dead Wi-Fi).
 const SILENCE_LIMIT: Duration = Duration::from_secs(20);
@@ -124,6 +128,10 @@ async fn run(mut socket: WebSocket, state: Arc<ServerState>, paired_as: String) 
         .into_iter()
         .map(|(earfcn, pci)| [earfcn, u32::from(pci)])
         .collect();
+    let cell_ids: Vec<Value> = status::cell_ids_list()
+        .into_iter()
+        .map(|(earfcn, pci, plmn, tac, eci)| json!([earfcn, pci, plmn, tac, eci]))
+        .collect();
     let hello = json!({
         "type": "hello",
         "device": "orbic",
@@ -133,6 +141,7 @@ async fn run(mut socket: WebSocket, state: Arc<ServerState>, paired_as: String) 
     });
     let mut alive = send(&mut socket, hello).await
         && send(&mut socket, json!({"type": "cells", "cells": cells})).await
+        && send(&mut socket, json!({"type": "cell_ids", "cells": cell_ids})).await
         && send(&mut socket, status_json()).await;
 
     let mut tick = tokio::time::interval(TICK);
@@ -199,6 +208,16 @@ fn status_json() -> Value {
 fn event_json(event: Event) -> Value {
     match event {
         Event::Cell { earfcn, pci } => json!({"type": "cell", "earfcn": earfcn, "pci": pci}),
+        Event::CellId {
+            earfcn,
+            pci,
+            plmn,
+            tac,
+            eci,
+        } => json!({
+            "type": "cell_id", "earfcn": earfcn, "pci": pci,
+            "plmn": plmn, "tac": tac, "eci": eci,
+        }),
         Event::Alert {
             severity,
             stingrays,

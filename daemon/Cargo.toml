@@ -21,6 +21,7 @@ apidocs = ["dep:utoipa", "wifi-station/utoipa"]
 
 [dependencies]
 rayhunter = { path = "../lib" }
+telcom-parser = { path = "../telcom-parser" }
 wifi-station = "0.10.1"
 toml = "0.8.8"
 serde = { version = "1.0.193", features = ["derive"] }
