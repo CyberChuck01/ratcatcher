@@ -126,6 +126,28 @@ pub fn cell_ids_list() -> Vec<(u32, u16, String, u16, u32)> {
         .collect()
 }
 
+/// One cell the Orbic has heard, with its identity when SIB1 has been decoded.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CellInfo {
+    pub earfcn: u32,
+    pub pci: u16,
+    /// (PLMN "MCC-MNC", TAC, ECI), once known.
+    pub id: Option<(String, u16, u32)>,
+}
+
+/// Every cell heard this session, with identities where known.
+pub fn cells_detail() -> Vec<CellInfo> {
+    let s = lock();
+    s.cells
+        .iter()
+        .map(|&(earfcn, pci)| CellInfo {
+            earfcn,
+            pci,
+            id: s.ids.get(&(earfcn, pci)).cloned(),
+        })
+        .collect()
+}
+
 /// Everything the screen needs, copied out so no lock is held while drawing.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Snapshot {

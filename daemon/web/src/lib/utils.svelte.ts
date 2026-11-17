@@ -142,6 +142,28 @@ export async function get_logs(): Promise<string> {
     return await req('GET', '/api/log');
 }
 
+export interface TunnelRatCell {
+    earfcn: number;
+    pci: number;
+    plmn: string | null;
+    tac: number | null;
+    eci: number | null;
+    enb: number | null;
+    sector: number | null;
+}
+
+export interface TunnelRatCells {
+    link: 'unpaired' | 'waiting' | 'connected' | 'lost';
+    recording: boolean;
+    stingrays: number;
+    cells: TunnelRatCell[];
+}
+
+/** Tunnel R.A.T.: cells heard this session, with identities where known. */
+export async function get_tunnel_rat_cells(): Promise<TunnelRatCells> {
+    return JSON.parse(await req('GET', '/api/tunnel-rat/cells'));
+}
+
 export async function get_config(): Promise<Config> {
     return JSON.parse(await req('GET', '/api/config'));
 }

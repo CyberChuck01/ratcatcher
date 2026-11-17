@@ -6,6 +6,13 @@
     --color-rayhunter-green: #94ea18;
 }
 
+/* Tunnel R.A.T. theme: on when Device UI is set to "Tunnel R.A.T." in the config. */
+:root[data-theme='tunnel-rat'] {
+    --color-rayhunter-blue: #14202b;
+    --color-rayhunter-dark-blue: #0b141c;
+    --color-rayhunter-green: #3ddc84;
+}
+
 @utility form-control {
     @apply px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-rayhunter-blue;
 }

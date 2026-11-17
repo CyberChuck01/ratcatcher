@@ -6,6 +6,7 @@
         get_update_status,
         get_gps,
         get_config,
+        get_tunnel_rat_cells,
         GpsMode,
         type UpdateStatus,
         type GpsData,
@@ -21,6 +22,7 @@
     import ActionErrors from '$lib/components/ActionErrors.svelte';
     import ClockDriftAlert from '$lib/components/ClockDriftAlert.svelte';
     import LogView from '$lib/components/LogView.svelte';
+    import TowersView from '$lib/components/TowersView.svelte';
     import UpdateNotice from '$lib/components/UpdateNotice.svelte';
     import Alert from '$lib/components/Alert.svelte';
     import NavItem from '$lib/components/NavItem.svelte';
@@ -35,6 +37,10 @@
     let update_error: string | undefined = $state(undefined);
     let logview_shown: boolean = $state(false);
     let config_shown: boolean = $state(false);
+    let towers_shown: boolean = $state(false);
+    // Tunnel R.A.T. theme: on when Device UI is set to "Tunnel R.A.T." (ui_level 5).
+    let tr_theme: boolean = $state(false);
+    let tr_link: string = $state('waiting');
     let gps_data: GpsData | null = $state(null);
     let gps_mode: GpsMode = $state(GpsMode.Disabled);
     let update_status: UpdateStatus | null = $state(null);
@@ -65,6 +71,15 @@
                 }
                 const config = await get_config();
                 gps_mode = config.gps_mode;
+                tr_theme = config.ui_level === 5;
+                document.documentElement.dataset.theme = tr_theme ? 'tunnel-rat' : '';
+                if (tr_theme) {
+                    try {
+                        tr_link = (await get_tunnel_rat_cells()).link;
+                    } catch (error) {
+                        console.error('Error fetching Tunnel R.A.T. status:', error);
+                    }
+                }
                 gps_data = await get_gps();
                 update_error = undefined;
                 loaded = true;
@@ -83,11 +98,29 @@
 
 <LogView bind:shown={logview_shown} />
 <ConfigForm bind:shown={config_shown} />
+<TowersView bind:shown={towers_shown} />
 <div
     class="p-4 xl:px-8 bg-rayhunter-blue drop-shadow-sm flex flex-row justify-between items-center"
 >
     <!-- https://www.w3.org/WAI/tutorials/images/decorative/ -->
-    <img src="/rayhunter_text.png" alt="" class="h-10 xl:h-12" />
+    {#if tr_theme}
+        <div class="flex flex-row items-center gap-3">
+            <img
+                src={tr_link === 'connected'
+                    ? '/tunnel-rat-orbic_rat_green.png'
+                    : tr_link === 'lost'
+                      ? '/tunnel-rat-orbic_rat_red.png'
+                      : '/tunnel-rat-orbic_rat_yellow.png'}
+                alt=""
+                class="h-10 xl:h-12 rounded-md"
+            />
+            <span class="text-white text-xl xl:text-2xl font-bold tracking-widest"
+                >TUNNEL R.A.T.</span
+            >
+        </div>
+    {:else}
+        <img src="/rayhunter_text.png" alt="" class="h-10 xl:h-12" />
+    {/if}
     <div class="flex flex-row gap-4">
         <NavItem label="Logs" onclick={() => (logview_shown = true)}>
             {#snippet icon()}
@@ -131,6 +164,28 @@
                         stroke-width="1.5"
                         stroke-linecap="round"
                     />
+                </svg>
+            {/snippet}
+        </NavItem>
+        <NavItem label="Towers" onclick={() => (towers_shown = true)}>
+            {#snippet icon()}
+                <svg
+                    class="w-6 h-6 text-white group-hover:text-gray-400"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                        d="M12 12v9M9 21h6M12 12 8 21M12 12l4 9M7.5 7.5a6 6 0 0 0 0 8.5M16.5 7.5a6 6 0 0 1 0 8.5M4.5 4.5a10 10 0 0 0 0 14.5M19.5 4.5a10 10 0 0 1 0 14.5"
+                    />
+                    <circle cx="12" cy="10" r="1.5" fill="currentColor" />
                 </svg>
             {/snippet}
         </NavItem>
