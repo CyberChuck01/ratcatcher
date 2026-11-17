@@ -7,94 +7,92 @@
 }
 
 /* Tunnel R.A.T. themes. Chosen on the "Themes" page (or follow Device UI = Tunnel R.A.T.).
- * They use their own attribute, `data-tr-theme`, so they never touch Rayhunter's defaults. */
+ * They use their own attribute, `data-tr-theme`, so they never touch Rayhunter's defaults.
+ * The --tr-* colors come from the Tunnel R.A.T. dashboard's color system (see trTheme.ts);
+ * these are its default (Red Team) values until the page sets them. */
+:root {
+    --tr-accent: #ff2222;
+    --tr-xaccent: #ff4444;
+    --tr-dred: #cc1b1b;
+    --tr-dim: #440000;
+    --tr-ddim: #220000;
+    --tr-border: #330000;
+    --tr-sec: #ff6666;
+    --tr-card: #0d0000;
+    --tr-tab: #ff2222;
+    --tr-bg: #080000;
+}
+
 :root[data-tr-theme='tunnel-rat'],
 :root[data-tr-theme='tunnel-rat-dark'] {
     --color-rayhunter-blue: #14202b;
     --color-rayhunter-dark-blue: #0b141c;
-    --color-rayhunter-green: #3ddc84;
 }
 
-/* Accent colors: the rat's status colors. Default is terminal green. */
-:root {
-    --tr-accent: #39ff88;
-}
-:root[data-tr-accent='green'] {
-    --tr-accent: #8cf3b4;
-}
-:root[data-tr-accent='yellow'] {
-    --tr-accent: #ffe48c;
-}
-:root[data-tr-accent='blue'] {
-    --tr-accent: #8ccdff;
-}
-:root[data-tr-accent='red'] {
-    --tr-accent: #ff9a9a;
-}
-:root[data-tr-accent='purple'] {
-    --tr-accent: #dba9ff;
-}
 /* Tunnel R.A.T. Light: an accent line under the dark header. */
 html[data-tr-theme='tunnel-rat'] .bg-rayhunter-blue {
     border-bottom: 3px solid var(--tr-accent);
 }
 
-/* Tunnel R.A.T. Dark: terminal green on near-black, like the Tunnel R.A.T. dashboard. */
+/* Tunnel R.A.T. Dashboard: the dashboard's monospace, dark, color-driven look. */
 :root[data-tr-theme='tunnel-rat-dark'] {
-    --color-rayhunter-blue: #0f1a14;
-    --color-rayhunter-dark-blue: #0a120d;
-    --color-rayhunter-green: #39ff88;
+    --color-rayhunter-blue: var(--tr-card);
+    --color-rayhunter-dark-blue: var(--tr-bg);
+    --color-rayhunter-green: var(--tr-accent);
     color-scheme: dark;
 }
 html[data-tr-theme='tunnel-rat-dark'] body {
-    background: #080d0a;
-    color: #d6f5e0;
+    background: var(--tr-bg);
+    color: var(--tr-sec);
+    font-family: 'Courier New', monospace;
 }
 html[data-tr-theme='tunnel-rat-dark'] .bg-rayhunter-blue {
-    border-bottom: 1px solid color-mix(in srgb, var(--tr-accent) 45%, black);
+    border-bottom: 1px solid var(--tr-border);
 }
 html[data-tr-theme='tunnel-rat-dark'] .bg-white {
-    background-color: #0f1a14;
+    background-color: var(--tr-card);
 }
 html[data-tr-theme='tunnel-rat-dark'] .bg-gray-100,
 html[data-tr-theme='tunnel-rat-dark'] .bg-gray-200 {
-    background-color: #14231a;
+    background-color: var(--tr-ddim);
 }
 html[data-tr-theme='tunnel-rat-dark'] .bg-gray-300 {
-    background-color: #1c3224;
+    background-color: var(--tr-dim);
 }
 html[data-tr-theme='tunnel-rat-dark'] .hover\:bg-gray-50:hover,
 html[data-tr-theme='tunnel-rat-dark'] .hover\:bg-gray-200:hover {
-    background-color: #1c3224;
+    background-color: var(--tr-ddim);
 }
 html[data-tr-theme='tunnel-rat-dark'] .border-gray-100,
 html[data-tr-theme='tunnel-rat-dark'] .border-gray-200,
 html[data-tr-theme='tunnel-rat-dark'] .border-gray-300,
 html[data-tr-theme='tunnel-rat-dark'] .border-gray-400,
 html[data-tr-theme='tunnel-rat-dark'] .border-white {
-    border-color: #1f3a2a;
+    border-color: var(--tr-border);
 }
 html[data-tr-theme='tunnel-rat-dark'] .divide-gray-200 > :not(:last-child) {
-    border-color: #1f3a2a;
+    border-color: var(--tr-border);
 }
 html[data-tr-theme='tunnel-rat-dark'] .text-gray-400,
 html[data-tr-theme='tunnel-rat-dark'] .text-gray-500,
 html[data-tr-theme='tunnel-rat-dark'] .text-gray-600 {
-    color: #8fb59d;
+    color: color-mix(in srgb, var(--tr-sec) 70%, var(--tr-bg));
 }
 html[data-tr-theme='tunnel-rat-dark'] .text-gray-700,
 html[data-tr-theme='tunnel-rat-dark'] .text-gray-800 {
-    color: #d6f5e0;
+    color: var(--tr-sec);
 }
 html[data-tr-theme='tunnel-rat-dark'] .text-blue-600,
 html[data-tr-theme='tunnel-rat-dark'] .text-rayhunter-blue {
     color: var(--tr-accent);
 }
+/* Primary buttons: like the dashboard's active button (accent fill, black text). */
 html[data-tr-theme='tunnel-rat-dark'] .bg-blue-500 {
-    background-color: color-mix(in srgb, var(--tr-accent) 55%, black);
+    background-color: var(--tr-accent);
+    color: #000;
 }
 html[data-tr-theme='tunnel-rat-dark'] .hover\:bg-blue-700:hover {
-    background-color: color-mix(in srgb, var(--tr-accent) 40%, black);
+    background-color: var(--tr-dred);
 }
 /* Alerts keep their meaning (red / yellow / green) but sit on dark panels. */
 html[data-tr-theme='tunnel-rat-dark'] .bg-red-100,
@@ -126,8 +124,8 @@ html[data-tr-theme='tunnel-rat-dark'] .text-green-700 {
 html[data-tr-theme='tunnel-rat-dark'] input,
 html[data-tr-theme='tunnel-rat-dark'] select,
 html[data-tr-theme='tunnel-rat-dark'] textarea {
-    background-color: #0f1a14;
-    color: #d6f5e0;
+    background-color: var(--tr-bg);
+    color: var(--tr-sec);
 }
 
 @utility form-control {

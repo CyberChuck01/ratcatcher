@@ -26,14 +26,14 @@
     import ThemesView from '$lib/components/ThemesView.svelte';
     import WifiView from '$lib/components/WifiView.svelte';
     import {
-        apply_accent,
+        apply_colors,
         apply_theme,
-        get_accent_choice,
+        get_colors,
         get_theme_choice,
         resolve_theme,
-        save_accent_choice,
+        save_colors,
         save_theme_choice,
-        type AccentChoice,
+        type DashColors,
         type ThemeChoice,
     } from '$lib/trTheme';
     import UpdateNotice from '$lib/components/UpdateNotice.svelte';
@@ -53,7 +53,7 @@
     let towers_shown: boolean = $state(false);
     let themes_shown: boolean = $state(false);
     let wifi_shown: boolean = $state(false);
-    let accent_choice: AccentChoice = $state(get_accent_choice());
+    let dash_colors: DashColors = $state(get_colors());
     // Tunnel R.A.T. themes: the viewer's choice (saved in this browser), resolved
     // against Device UI = "Tunnel R.A.T." (ui_level 5) when set to automatic.
     let theme_choice: ThemeChoice = $state(get_theme_choice());
@@ -65,12 +65,12 @@
     });
 
     $effect(() => {
-        apply_accent(accent_choice);
+        apply_colors(dash_colors);
     });
 
-    function choose_accent(choice: AccentChoice) {
-        accent_choice = choice;
-        save_accent_choice(choice);
+    function choose_colors(colors: DashColors) {
+        dash_colors = colors;
+        save_colors(colors);
     }
 
     function choose_theme(choice: ThemeChoice) {
@@ -139,8 +139,8 @@
     bind:shown={themes_shown}
     choice={theme_choice}
     onchoose={choose_theme}
-    accent={accent_choice}
-    onaccent={choose_accent}
+    colors={dash_colors}
+    oncolors={choose_colors}
 />
 <WifiView bind:shown={wifi_shown} />
 <div
