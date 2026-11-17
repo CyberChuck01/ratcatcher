@@ -6,11 +6,104 @@
     --color-rayhunter-green: #94ea18;
 }
 
-/* Tunnel R.A.T. theme: on when Device UI is set to "Tunnel R.A.T." in the config. */
-:root[data-theme='tunnel-rat'] {
+/* Tunnel R.A.T. themes. Chosen on the "Themes" page (or follow Device UI = Tunnel R.A.T.).
+ * They use their own attribute, `data-tr-theme`, so they never touch Rayhunter's defaults. */
+:root[data-tr-theme='tunnel-rat'],
+:root[data-tr-theme='tunnel-rat-dark'] {
     --color-rayhunter-blue: #14202b;
     --color-rayhunter-dark-blue: #0b141c;
     --color-rayhunter-green: #3ddc84;
+}
+
+/* Tunnel R.A.T. Dark: terminal green on near-black, like the Tunnel R.A.T. dashboard. */
+:root[data-tr-theme='tunnel-rat-dark'] {
+    --color-rayhunter-blue: #0f1a14;
+    --color-rayhunter-dark-blue: #0a120d;
+    --color-rayhunter-green: #39ff88;
+    color-scheme: dark;
+}
+html[data-tr-theme='tunnel-rat-dark'] body {
+    background: #080d0a;
+    color: #d6f5e0;
+}
+html[data-tr-theme='tunnel-rat-dark'] .bg-rayhunter-blue {
+    border-bottom: 1px solid #1f6b3f;
+}
+html[data-tr-theme='tunnel-rat-dark'] .bg-white {
+    background-color: #0f1a14;
+}
+html[data-tr-theme='tunnel-rat-dark'] .bg-gray-100,
+html[data-tr-theme='tunnel-rat-dark'] .bg-gray-200 {
+    background-color: #14231a;
+}
+html[data-tr-theme='tunnel-rat-dark'] .bg-gray-300 {
+    background-color: #1c3224;
+}
+html[data-tr-theme='tunnel-rat-dark'] .hover\:bg-gray-50:hover,
+html[data-tr-theme='tunnel-rat-dark'] .hover\:bg-gray-200:hover {
+    background-color: #1c3224;
+}
+html[data-tr-theme='tunnel-rat-dark'] .border-gray-100,
+html[data-tr-theme='tunnel-rat-dark'] .border-gray-200,
+html[data-tr-theme='tunnel-rat-dark'] .border-gray-300,
+html[data-tr-theme='tunnel-rat-dark'] .border-gray-400,
+html[data-tr-theme='tunnel-rat-dark'] .border-white {
+    border-color: #1f3a2a;
+}
+html[data-tr-theme='tunnel-rat-dark'] .divide-gray-200 > :not(:last-child) {
+    border-color: #1f3a2a;
+}
+html[data-tr-theme='tunnel-rat-dark'] .text-gray-400,
+html[data-tr-theme='tunnel-rat-dark'] .text-gray-500,
+html[data-tr-theme='tunnel-rat-dark'] .text-gray-600 {
+    color: #8fb59d;
+}
+html[data-tr-theme='tunnel-rat-dark'] .text-gray-700,
+html[data-tr-theme='tunnel-rat-dark'] .text-gray-800 {
+    color: #d6f5e0;
+}
+html[data-tr-theme='tunnel-rat-dark'] .text-blue-600,
+html[data-tr-theme='tunnel-rat-dark'] .text-rayhunter-blue {
+    color: #39ff88;
+}
+html[data-tr-theme='tunnel-rat-dark'] .bg-blue-500 {
+    background-color: #1f9d55;
+}
+html[data-tr-theme='tunnel-rat-dark'] .hover\:bg-blue-700:hover {
+    background-color: #15803d;
+}
+/* Alerts keep their meaning (red / yellow / green) but sit on dark panels. */
+html[data-tr-theme='tunnel-rat-dark'] .bg-red-100,
+html[data-tr-theme='tunnel-rat-dark'] .bg-red-200 {
+    background-color: #2a1212;
+}
+html[data-tr-theme='tunnel-rat-dark'] .bg-yellow-50,
+html[data-tr-theme='tunnel-rat-dark'] .bg-yellow-100,
+html[data-tr-theme='tunnel-rat-dark'] .bg-yellow-200 {
+    background-color: #2a2410;
+}
+html[data-tr-theme='tunnel-rat-dark'] .bg-green-100,
+html[data-tr-theme='tunnel-rat-dark'] .bg-green-200 {
+    background-color: #10291a;
+}
+html[data-tr-theme='tunnel-rat-dark'] .text-red-600,
+html[data-tr-theme='tunnel-rat-dark'] .text-red-700 {
+    color: #ff8a8a;
+}
+html[data-tr-theme='tunnel-rat-dark'] .text-yellow-600,
+html[data-tr-theme='tunnel-rat-dark'] .text-yellow-700,
+html[data-tr-theme='tunnel-rat-dark'] .text-yellow-800 {
+    color: #f5d76e;
+}
+html[data-tr-theme='tunnel-rat-dark'] .text-green-600,
+html[data-tr-theme='tunnel-rat-dark'] .text-green-700 {
+    color: #6ee7a0;
+}
+html[data-tr-theme='tunnel-rat-dark'] input,
+html[data-tr-theme='tunnel-rat-dark'] select,
+html[data-tr-theme='tunnel-rat-dark'] textarea {
+    background-color: #0f1a14;
+    color: #d6f5e0;
 }
 
 @utility form-control {

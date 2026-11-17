@@ -23,6 +23,14 @@
     import ClockDriftAlert from '$lib/components/ClockDriftAlert.svelte';
     import LogView from '$lib/components/LogView.svelte';
     import TowersView from '$lib/components/TowersView.svelte';
+    import ThemesView from '$lib/components/ThemesView.svelte';
+    import {
+        apply_theme,
+        get_theme_choice,
+        resolve_theme,
+        save_theme_choice,
+        type ThemeChoice,
+    } from '$lib/trTheme';
     import UpdateNotice from '$lib/components/UpdateNotice.svelte';
     import Alert from '$lib/components/Alert.svelte';
     import NavItem from '$lib/components/NavItem.svelte';
@@ -38,8 +46,21 @@
     let logview_shown: boolean = $state(false);
     let config_shown: boolean = $state(false);
     let towers_shown: boolean = $state(false);
-    // Tunnel R.A.T. theme: on when Device UI is set to "Tunnel R.A.T." (ui_level 5).
-    let tr_theme: boolean = $state(false);
+    let themes_shown: boolean = $state(false);
+    // Tunnel R.A.T. themes: the viewer's choice (saved in this browser), resolved
+    // against Device UI = "Tunnel R.A.T." (ui_level 5) when set to automatic.
+    let theme_choice: ThemeChoice = $state(get_theme_choice());
+    let ui_level: number | undefined = $state(undefined);
+    let tr_theme: boolean = $derived(resolve_theme(theme_choice, ui_level) !== 'default');
+
+    $effect(() => {
+        apply_theme(resolve_theme(theme_choice, ui_level));
+    });
+
+    function choose_theme(choice: ThemeChoice) {
+        theme_choice = choice;
+        save_theme_choice(choice);
+    }
     let tr_link: string = $state('waiting');
     let gps_data: GpsData | null = $state(null);
     let gps_mode: GpsMode = $state(GpsMode.Disabled);
@@ -71,8 +92,7 @@
                 }
                 const config = await get_config();
                 gps_mode = config.gps_mode;
-                tr_theme = config.ui_level === 5;
-                document.documentElement.dataset.theme = tr_theme ? 'tunnel-rat' : '';
+                ui_level = config.ui_level;
                 if (tr_theme) {
                     try {
                         tr_link = (await get_tunnel_rat_cells()).link;
@@ -99,6 +119,7 @@
 <LogView bind:shown={logview_shown} />
 <ConfigForm bind:shown={config_shown} />
 <TowersView bind:shown={towers_shown} />
+<ThemesView bind:shown={themes_shown} choice={theme_choice} onchoose={choose_theme} />
 <div
     class="p-4 xl:px-8 bg-rayhunter-blue drop-shadow-sm flex flex-row justify-between items-center"
 >
@@ -186,6 +207,30 @@
                         d="M12 12v9M9 21h6M12 12 8 21M12 12l4 9M7.5 7.5a6 6 0 0 0 0 8.5M16.5 7.5a6 6 0 0 1 0 8.5M4.5 4.5a10 10 0 0 0 0 14.5M19.5 4.5a10 10 0 0 1 0 14.5"
                     />
                     <circle cx="12" cy="10" r="1.5" fill="currentColor" />
+                </svg>
+            {/snippet}
+        </NavItem>
+        <NavItem label="Themes" onclick={() => (themes_shown = true)}>
+            {#snippet icon()}
+                <svg
+                    class="w-6 h-6 text-white group-hover:text-gray-400"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                        d="M12 3a9 9 0 1 0 0 18c1.1 0 1.5-.8 1.5-1.5 0-.9-.6-1.2-.6-2.1 0-1 .8-1.4 1.8-1.4H17a4 4 0 0 0 4-4c0-4.4-4-9-9-9Z"
+                    />
+                    <circle cx="7.5" cy="11" r="1" fill="currentColor" />
+                    <circle cx="10.5" cy="7" r="1" fill="currentColor" />
+                    <circle cx="15" cy="7.5" r="1" fill="currentColor" />
                 </svg>
             {/snippet}
         </NavItem>
