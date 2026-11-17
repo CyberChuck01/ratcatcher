@@ -43,6 +43,55 @@ export const THEMES: ThemeInfo[] = [
     },
 ];
 
+/** The Tunnel R.A.T. status colors from the Orbic rat. */
+export type AccentChoice = 'default' | 'green' | 'yellow' | 'blue' | 'red' | 'purple';
+
+export interface AccentInfo {
+    id: AccentChoice;
+    name: string;
+    meaning: string;
+    color: string;
+}
+
+export const ACCENTS: AccentInfo[] = [
+    { id: 'default', name: 'Theme default', meaning: 'Green for Tunnel R.A.T.', color: '#39ff88' },
+    { id: 'green', name: 'Green', meaning: 'Connected', color: '#8cf3b4' },
+    { id: 'yellow', name: 'Yellow', meaning: 'No connection', color: '#ffe48c' },
+    { id: 'blue', name: 'Blue', meaning: 'Picking up cell towers', color: '#8ccdff' },
+    { id: 'red', name: 'Red', meaning: 'Lost connection', color: '#ff9a9a' },
+    { id: 'purple', name: 'Purple', meaning: 'Possible stingray', color: '#dba9ff' },
+];
+
+const ACCENT_KEY = 'tunnel-rat-accent';
+
+export function get_accent_choice(): AccentChoice {
+    try {
+        const v = localStorage.getItem(ACCENT_KEY);
+        if (ACCENTS.some((a) => a.id === v)) {
+            return v as AccentChoice;
+        }
+    } catch {
+        // storage blocked
+    }
+    return 'default';
+}
+
+export function save_accent_choice(choice: AccentChoice) {
+    try {
+        localStorage.setItem(ACCENT_KEY, choice);
+    } catch {
+        // storage blocked
+    }
+}
+
+export function apply_accent(choice: AccentChoice) {
+    if (choice === 'default') {
+        delete document.documentElement.dataset.trAccent;
+    } else {
+        document.documentElement.dataset.trAccent = choice;
+    }
+}
+
 const KEY = 'tunnel-rat-theme';
 
 export function get_theme_choice(): ThemeChoice {

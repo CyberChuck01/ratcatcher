@@ -38,7 +38,14 @@
 		flex flex-col p-2 drop-shadow-sm"
     >
         <div class="flex justify-between items-center p-1">
-            <span class="text-2xl">{title}</span>
+            <div class="flex flex-row items-center gap-3">
+                <button
+                    type="button"
+                    class="px-3 py-1 border border-gray-300 rounded-md text-sm"
+                    onclick={() => (shown = false)}>&larr; Back</button
+                >
+                <span class="text-2xl">{title}</span>
+            </div>
             <button onclick={() => (shown = false)} aria-label="close">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

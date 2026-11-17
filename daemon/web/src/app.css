@@ -15,6 +15,30 @@
     --color-rayhunter-green: #3ddc84;
 }
 
+/* Accent colors: the rat's status colors. Default is terminal green. */
+:root {
+    --tr-accent: #39ff88;
+}
+:root[data-tr-accent='green'] {
+    --tr-accent: #8cf3b4;
+}
+:root[data-tr-accent='yellow'] {
+    --tr-accent: #ffe48c;
+}
+:root[data-tr-accent='blue'] {
+    --tr-accent: #8ccdff;
+}
+:root[data-tr-accent='red'] {
+    --tr-accent: #ff9a9a;
+}
+:root[data-tr-accent='purple'] {
+    --tr-accent: #dba9ff;
+}
+/* Tunnel R.A.T. Light: an accent line under the dark header. */
+html[data-tr-theme='tunnel-rat'] .bg-rayhunter-blue {
+    border-bottom: 3px solid var(--tr-accent);
+}
+
 /* Tunnel R.A.T. Dark: terminal green on near-black, like the Tunnel R.A.T. dashboard. */
 :root[data-tr-theme='tunnel-rat-dark'] {
     --color-rayhunter-blue: #0f1a14;
@@ -27,7 +51,7 @@ html[data-tr-theme='tunnel-rat-dark'] body {
     color: #d6f5e0;
 }
 html[data-tr-theme='tunnel-rat-dark'] .bg-rayhunter-blue {
-    border-bottom: 1px solid #1f6b3f;
+    border-bottom: 1px solid color-mix(in srgb, var(--tr-accent) 45%, black);
 }
 html[data-tr-theme='tunnel-rat-dark'] .bg-white {
     background-color: #0f1a14;
@@ -64,13 +88,13 @@ html[data-tr-theme='tunnel-rat-dark'] .text-gray-800 {
 }
 html[data-tr-theme='tunnel-rat-dark'] .text-blue-600,
 html[data-tr-theme='tunnel-rat-dark'] .text-rayhunter-blue {
-    color: #39ff88;
+    color: var(--tr-accent);
 }
 html[data-tr-theme='tunnel-rat-dark'] .bg-blue-500 {
-    background-color: #1f9d55;
+    background-color: color-mix(in srgb, var(--tr-accent) 55%, black);
 }
 html[data-tr-theme='tunnel-rat-dark'] .hover\:bg-blue-700:hover {
-    background-color: #15803d;
+    background-color: color-mix(in srgb, var(--tr-accent) 40%, black);
 }
 /* Alerts keep their meaning (red / yellow / green) but sit on dark panels. */
 html[data-tr-theme='tunnel-rat-dark'] .bg-red-100,

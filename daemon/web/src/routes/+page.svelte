@@ -24,11 +24,16 @@
     import LogView from '$lib/components/LogView.svelte';
     import TowersView from '$lib/components/TowersView.svelte';
     import ThemesView from '$lib/components/ThemesView.svelte';
+    import WifiView from '$lib/components/WifiView.svelte';
     import {
+        apply_accent,
         apply_theme,
+        get_accent_choice,
         get_theme_choice,
         resolve_theme,
+        save_accent_choice,
         save_theme_choice,
+        type AccentChoice,
         type ThemeChoice,
     } from '$lib/trTheme';
     import UpdateNotice from '$lib/components/UpdateNotice.svelte';
@@ -47,6 +52,8 @@
     let config_shown: boolean = $state(false);
     let towers_shown: boolean = $state(false);
     let themes_shown: boolean = $state(false);
+    let wifi_shown: boolean = $state(false);
+    let accent_choice: AccentChoice = $state(get_accent_choice());
     // Tunnel R.A.T. themes: the viewer's choice (saved in this browser), resolved
     // against Device UI = "Tunnel R.A.T." (ui_level 5) when set to automatic.
     let theme_choice: ThemeChoice = $state(get_theme_choice());
@@ -56,6 +63,15 @@
     $effect(() => {
         apply_theme(resolve_theme(theme_choice, ui_level));
     });
+
+    $effect(() => {
+        apply_accent(accent_choice);
+    });
+
+    function choose_accent(choice: AccentChoice) {
+        accent_choice = choice;
+        save_accent_choice(choice);
+    }
 
     function choose_theme(choice: ThemeChoice) {
         theme_choice = choice;
@@ -119,9 +135,16 @@
 <LogView bind:shown={logview_shown} />
 <ConfigForm bind:shown={config_shown} />
 <TowersView bind:shown={towers_shown} />
-<ThemesView bind:shown={themes_shown} choice={theme_choice} onchoose={choose_theme} />
+<ThemesView
+    bind:shown={themes_shown}
+    choice={theme_choice}
+    onchoose={choose_theme}
+    accent={accent_choice}
+    onaccent={choose_accent}
+/>
+<WifiView bind:shown={wifi_shown} />
 <div
-    class="p-4 xl:px-8 bg-rayhunter-blue drop-shadow-sm flex flex-row justify-between items-center"
+    class="p-4 xl:px-8 bg-rayhunter-blue drop-shadow-sm flex flex-row flex-wrap gap-2 justify-between items-center"
 >
     <!-- https://www.w3.org/WAI/tutorials/images/decorative/ -->
     {#if tr_theme}
@@ -142,7 +165,7 @@
     {:else}
         <img src="/rayhunter_text.png" alt="" class="h-10 xl:h-12" />
     {/if}
-    <div class="flex flex-row gap-4">
+    <div class="flex flex-row flex-wrap gap-3 md:gap-4">
         <NavItem label="Logs" onclick={() => (logview_shown = true)}>
             {#snippet icon()}
                 <svg
@@ -207,6 +230,28 @@
                         d="M12 12v9M9 21h6M12 12 8 21M12 12l4 9M7.5 7.5a6 6 0 0 0 0 8.5M16.5 7.5a6 6 0 0 1 0 8.5M4.5 4.5a10 10 0 0 0 0 14.5M19.5 4.5a10 10 0 0 1 0 14.5"
                     />
                     <circle cx="12" cy="10" r="1.5" fill="currentColor" />
+                </svg>
+            {/snippet}
+        </NavItem>
+        <NavItem label="Wi-Fi" onclick={() => (wifi_shown = true)}>
+            {#snippet icon()}
+                <svg
+                    class="w-6 h-6 text-white group-hover:text-gray-400"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                        d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.5 16a5 5 0 0 1 7 0"
+                    />
+                    <circle cx="12" cy="19" r="1.3" fill="currentColor" />
                 </svg>
             {/snippet}
         </NavItem>
