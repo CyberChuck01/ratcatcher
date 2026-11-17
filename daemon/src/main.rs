@@ -90,6 +90,7 @@ fn get_router() -> AppRouter {
         .route("/api/gps", get(get_gps))
         .route("/api/gps", post(post_gps))
         .route("/api/tunnel-rat/pair", post(tunnel_rat::pairing::pair))
+        .route("/api/tunnel-rat/link", get(tunnel_rat::link::link))
         .route("/", get(|| async { Redirect::permanent("/index.html") }))
         .route("/{*path}", get(serve_static))
 }

@@ -434,7 +434,7 @@ impl DiagTask {
 
             if max_type > EventType::Informational {
                 info!("a heuristic triggered on this run!");
-                crate::tunnel_rat::status::stingray_hit();
+                crate::tunnel_rat::status::stingray_hit(&format!("{max_type:?}"));
                 self.notification_channel
                     .send(Notification::new(
                         NotificationType::Warning,

@@ -89,12 +89,16 @@ pub fn tick() {
 }
 
 /// For the Tunnel R.A.T. link: is this the key we handed out?
-#[allow(dead_code)] // used once the link to Tunnel R.A.T. lands
 pub fn is_valid_key(key: &str) -> bool {
     lock()
         .paired
         .as_ref()
         .is_some_and(|p| constant_eq(p.api_key.as_bytes(), key.as_bytes()))
+}
+
+/// The name the hub gave when it paired ("PiPack", "Tunnel R.A.T."...), if paired.
+pub fn paired_name() -> Option<String> {
+    lock().paired.as_ref().map(|p| p.device_name.clone())
 }
 
 /// Forget the pairing and show a fresh code.
