@@ -11,7 +11,7 @@ It is the first public piece of [Tunnel R.A.T.](https://github.com/CyberChuck01)
 ## What it adds
 
 - **A status rat** on the Orbic's screen that changes colour with what is happening
-- **One-time pairing** with a code shown on the screen, instead of setup menus
+- **One-time pairing** with a code shown on the screen, instead of setup menus, or a **standalone mode** with no pairing at all
 - **A live link** to whatever you paired with: an API-keyed WebSocket that streams cells, status and stingray alerts
 - **Live counters** for the cells it hears and the possible stingrays it has flagged
 - **Cell identities** (network, tracking area and cell ID) read from each tower's own broadcast
@@ -58,6 +58,18 @@ Install straight over it; your recordings and settings stay. Because your settin
 
 Adding `--reset-config` to the install command also switches it, but it resets every other setting to its default too.
 
+### Using it on its own (standalone)
+
+Not pairing it with Tunnel R.A.T., a PiPack or anything else? Switch it to standalone mode and the pairing code goes away, so the counters show straight away:
+
+1. Open http://192.168.1.1:8080 and click **Config**.
+2. Set **Device UI Level** to **Ratcatcher standalone (rat, counters, no pairing)**.
+3. Click **Apply and restart**.
+
+In standalone mode the rat follows recording instead of a link: green while recording, a blue flash for a new cell, purple for a possible stingray and grey when paused. To pair later, switch back to **Ratcatcher** and the code comes back.
+
+![The standalone screen: recording, new cell flash, possible stingray and paused](doc/ratcatcher/ratcatcher_standalone-states.png)
+
 ## Pair it
 
 Pairing happens once: you send the 6-character code from the Orbic's screen and get back an API key that you keep. The code skips look-alike characters (no 0/O or 1/I/L), and it changes after 10 minutes or after 5 wrong tries.
@@ -79,7 +91,7 @@ An `api_key` back means it is paired; save it, because it is only shown once. A 
 
 ## Reading the screen
 
-The rat's colour tells you the state at a glance, and purple always wins.
+The rat's colour tells you the state at a glance, and purple always wins. These are the paired-mode colours; standalone mode's are [above](#using-it-on-its-own-standalone).
 
 | Rat | Meaning |
 | --- | --- |
