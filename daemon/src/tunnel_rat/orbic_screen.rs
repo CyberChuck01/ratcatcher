@@ -7,6 +7,11 @@
 //! Rat colours: purple = possible stingray, red = link lost,
 //! yellow = no link yet, blue flash = new cell found, green = connected.
 //!
+//! Standalone mode (ui_level 6) is for an Orbic used on its own: no pairing
+//! code, the counters show straight away, and the rat follows recording
+//! instead of the link: green = recording, blue flash = new cell,
+//! purple = possible stingray, grey = paused.
+//!
 //! Pure functions over a `Snapshot`, standard library only, so this file can
 //! be compiled and tested without the rest of the daemon.
 
@@ -22,6 +27,7 @@ pub const GREEN: Rgb = (0, 230, 90);
 pub const BLUE: Rgb = (0, 145, 255);
 pub const RED: Rgb = (255, 32, 32);
 pub const PURPLE: Rgb = (176, 64, 255);
+pub const PAUSED_GREY: Rgb = (170, 170, 170);
 const WHITE: Rgb = (240, 240, 240);
 const GREY: Rgb = (140, 140, 140);
 const DIVIDER: Rgb = (50, 50, 50);
@@ -34,9 +40,16 @@ const RAT_Y: usize = 1;
 const STRIP_Y: usize = RAT_Y + RAT_SIZE + 2; // 99
 
 /// Rat colour and whether it is in the dim half of a blink.
-pub fn rat_color(s: &Snapshot, blink_on: bool) -> (Rgb, bool) {
+pub fn rat_color(s: &Snapshot, blink_on: bool, standalone: bool) -> (Rgb, bool) {
     if s.stingrays > 0 {
         return (PURPLE, false);
+    }
+    if standalone {
+        return match (s.recording, s.new_cell) {
+            (false, _) => (PAUSED_GREY, false),
+            (true, true) => (BLUE, !blink_on),
+            (true, false) => (GREEN, false),
+        };
     }
     match s.link {
         Link::Lost => (RED, false),
@@ -47,13 +60,14 @@ pub fn rat_color(s: &Snapshot, blink_on: bool) -> (Rgb, bool) {
 }
 
 /// Render one full frame, rows top to bottom, ready for `write_buffer`.
-pub fn render(s: &Snapshot, blink_on: bool) -> Vec<Rgb> {
+/// `standalone` hides the pairing code and colours the rat by recording state.
+pub fn render(s: &Snapshot, blink_on: bool, standalone: bool) -> Vec<Rgb> {
     let mut fb = vec![(0u8, 0u8, 0u8); WIDTH * HEIGHT];
-    let (color, dim) = rat_color(s, blink_on);
+    let (color, dim) = rat_color(s, blink_on, standalone);
     draw_rat(&mut fb, color, if dim { 64 } else { 256 });
 
     match (&s.pair_code, s.link) {
-        (Some(code), Link::Unpaired) => {
+        (Some(code), Link::Unpaired) if !standalone => {
             draw_text_centered(&mut fb, WIDTH / 2, STRIP_Y, "PAIR CODE", 1, YELLOW);
             draw_text_centered(&mut fb, WIDTH / 2, STRIP_Y + 10, code, 2, WHITE);
         }
@@ -223,16 +237,43 @@ mod tests {
     #[test]
     fn colour_priority() {
         let mut s = snap(Link::Connected);
-        assert_eq!(rat_color(&s, true).0, GREEN);
+        assert_eq!(rat_color(&s, true, false).0, GREEN);
         s.new_cell = true;
-        assert_eq!(rat_color(&s, true), (BLUE, false));
-        assert_eq!(rat_color(&s, false), (BLUE, true));
-        assert_eq!(rat_color(&snap(Link::Waiting), true).0, YELLOW);
-        assert_eq!(rat_color(&snap(Link::Unpaired), true).0, YELLOW);
-        assert_eq!(rat_color(&snap(Link::Lost), true).0, RED);
+        assert_eq!(rat_color(&s, true, false), (BLUE, false));
+        assert_eq!(rat_color(&s, false, false), (BLUE, true));
+        assert_eq!(rat_color(&snap(Link::Waiting), true, false).0, YELLOW);
+        assert_eq!(rat_color(&snap(Link::Unpaired), true, false).0, YELLOW);
+        assert_eq!(rat_color(&snap(Link::Lost), true, false).0, RED);
         let mut s = snap(Link::Lost);
         s.stingrays = 2;
-        assert_eq!(rat_color(&s, true).0, PURPLE); // a stingray beats everything
+        assert_eq!(rat_color(&s, true, false).0, PURPLE); // a stingray beats everything
+    }
+
+    #[test]
+    fn standalone_ignores_the_link() {
+        // Never paired, but recording: green, not yellow
+        let mut s = snap(Link::Unpaired);
+        assert_eq!(rat_color(&s, true, true).0, GREEN);
+        s.new_cell = true;
+        assert_eq!(rat_color(&s, false, true), (BLUE, true));
+        s.recording = false;
+        assert_eq!(rat_color(&s, true, true).0, PAUSED_GREY);
+        s.stingrays = 1;
+        assert_eq!(rat_color(&s, true, true).0, PURPLE);
+        assert_eq!(rat_color(&snap(Link::Lost), true, true).0, GREEN); // no red without a hub
+    }
+
+    #[test]
+    fn standalone_hides_the_pair_code() {
+        let mut s = snap(Link::Unpaired);
+        s.pair_code = Some("7KX4QM".into());
+        let strip = |fb: &[Rgb]| fb[STRIP_Y * WIDTH..].to_vec();
+        // Paired mode draws the yellow "PAIR CODE" label in the strip...
+        assert!(strip(&render(&s, true, false)).contains(&YELLOW));
+        // ...standalone draws the counters instead, with no yellow anywhere.
+        let fb = render(&s, true, true);
+        assert!(!fb.contains(&YELLOW));
+        assert!(strip(&fb).contains(&DIVIDER)); // the line between CELLS and STINGRAY
     }
 
     #[test]
@@ -240,7 +281,7 @@ mod tests {
         assert_eq!(RAT.len(), RAT_SIZE * RAT_SIZE);
         let mut s = snap(Link::Unpaired);
         s.pair_code = Some("7KX4QM".into());
-        assert_eq!(render(&s, true).len(), WIDTH * HEIGHT);
+        assert_eq!(render(&s, true, false).len(), WIDTH * HEIGHT);
         assert!(text_width("7KX4QM", 2) <= WIDTH);
         assert!(text_width("STINGRAY", 1) <= WIDTH / 2);
         assert!(text_width(&count(5000), 2) <= WIDTH / 2);

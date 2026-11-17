@@ -41,12 +41,18 @@ pub fn update_ui(
     shutdown_token: CancellationToken,
     ui_update_rx: Receiver<DisplayState>,
 ) {
-    if config.ui_level == config::UiLevel::TunnelRat {
+    let standalone = match config.ui_level {
+        config::UiLevel::TunnelRat => Some(false),
+        config::UiLevel::RatcatcherStandalone => Some(true),
+        _ => None,
+    };
+    if let Some(standalone) = standalone {
         return super::tunnel_rat_orbic::update_ui(
             task_tracker,
             Framebuffer,
             shutdown_token,
             ui_update_rx,
+            standalone,
         );
     }
     generic_framebuffer::update_ui(

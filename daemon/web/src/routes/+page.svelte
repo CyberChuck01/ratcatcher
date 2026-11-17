@@ -55,7 +55,7 @@
     let wifi_shown: boolean = $state(false);
     let dash_colors: DashColors = $state(get_colors());
     // Tunnel R.A.T. themes: the viewer's choice (saved in this browser), resolved
-    // against Device UI = "Tunnel R.A.T." (ui_level 5) when set to automatic.
+    // against Device UI = Ratcatcher (ui_level 5 or 6) when set to automatic.
     let theme_choice: ThemeChoice = $state(get_theme_choice());
     let ui_level: number | undefined = $state(undefined);
     let tr_theme: boolean = $derived(resolve_theme(theme_choice, ui_level) !== 'default');

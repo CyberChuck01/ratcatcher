@@ -1,4 +1,4 @@
-//! Tunnel R.A.T. screen loop for the Orbic (ui_level = 5).
+//! Tunnel R.A.T. screen loop for the Orbic (ui_level 5, or 6 for standalone).
 //!
 //! Redraws every 250 ms so the blue new-cell flash is smooth, but only writes
 //! to the panel when the picture changes, or once a second as a refresh in
@@ -23,6 +23,7 @@ pub fn update_ui(
     mut fb: impl GenericFramebuffer,
     shutdown_token: CancellationToken,
     mut ui_update_rx: Receiver<DisplayState>,
+    standalone: bool,
 ) {
     pairing::init();
     task_tracker.spawn(async move {
@@ -48,7 +49,7 @@ pub fn update_ui(
 
             pairing::tick();
             let blink_on = (start.elapsed().as_millis() / BLINK.as_millis()) % 2 == 0;
-            let frame = orbic_screen::render(&status::snapshot(), blink_on);
+            let frame = orbic_screen::render(&status::snapshot(), blink_on, standalone);
 
             if last_frame.as_ref() != Some(&frame) || last_write.elapsed() >= FORCE_REDRAW {
                 fb.write_buffer(frame.clone()).await;

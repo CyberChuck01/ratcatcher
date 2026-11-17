@@ -27,6 +27,8 @@ pub enum UiLevel {
     HighVisibility = 4,
     /// Tunnel R.A.T.: status-coloured rat, pairing code, cell and stingray counters
     TunnelRat = 5,
+    /// Ratcatcher standalone: the rat and counters, no pairing code, for an Orbic used on its own
+    RatcatcherStandalone = 6,
     TransFlag = 128,
 }
 

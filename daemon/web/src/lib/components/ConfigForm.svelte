@@ -184,6 +184,7 @@
                         <option value={3}>EFF logo</option>
                         <option value={4}>High visibility (full screen color)</option>
                         <option value={5}>Ratcatcher (rat, pairing code, counters)</option>
+                        <option value={6}>Ratcatcher standalone (rat, counters, no pairing)</option>
                     </select>
                 </FormField>
 

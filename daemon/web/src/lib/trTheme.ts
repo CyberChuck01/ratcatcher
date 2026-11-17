@@ -180,7 +180,8 @@ export function resolve_theme(choice: ThemeChoice, ui_level: number | undefined)
     if (choice !== 'auto') {
         return choice;
     }
-    return ui_level === 5 ? 'tunnel-rat' : 'default';
+    // 5 = Ratcatcher, 6 = Ratcatcher standalone
+    return ui_level === 5 || ui_level === 6 ? 'tunnel-rat' : 'default';
 }
 
 export function apply_theme(theme: ResolvedTheme) {
